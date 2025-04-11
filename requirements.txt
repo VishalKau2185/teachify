@@ -1,0 +1,9 @@
+Flask
+openai
+elevenlabs
+PyMuPDF
+pytesseract
+easyocr
+python-dotenv
+Pillow
+werkzeug

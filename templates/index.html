@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teachify - Turn Slides into Lectures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
+    <div class="max-w-xl w-full space-y-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-extrabold text-gray-900">Teachify</h1>
+            <p class="mt-2 text-gray-600">Upload your slides and get a narrated video!</p>
+        </div>
+
+
+        <form id="upload-form" class="bg-white p-8 rounded-2xl shadow-md space-y-6" enctype="multipart/form-data">
+            <div>
+                <label class="block text-gray-700 font-medium mb-2" for="file">Upload PDF or PowerPoint</label>
+                <input type="file" name="file" id="file" accept=".pdf" required
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+
+            <div>
+                <label class="block text-gray-700 font-medium mb-2" for="custom_prompt">Optional Prompt</label>
+                <input type="text" name="custom_prompt" id="custom_prompt" maxlength="100"
+                    placeholder="e.g., Explain it more casually."
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+
+            <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                Generate Lecture Video
+            </button>
+        </form>
+
+
+        <div id="loading" class="hidden flex flex-col items-center mt-6">
+            <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <p class="text-gray-600 text-center">Processing your slides... <br><span class="text-sm">Longer slideshows may take a while (~20 seconds per slide). Please be patient!</span></p>
+        </div>
+
+
+        <div id="download" class="hidden flex flex-col items-center mt-6">
+            <a id="download-link" href="#" download
+                class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
+                Download Video
+            </a>
+        </div>
+
+
+        <div id="error" class="hidden mt-4 text-red-500 text-center font-semibold"></div>
+    </div>
+
+
+    <script>
+        const form = document.getElementById('upload-form');
+        const loading = document.getElementById('loading');
+        const download = document.getElementById('download');
+        const downloadLink = document.getElementById('download-link');
+        const errorDiv = document.getElementById('error');
+
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loading.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            download.classList.add('hidden');
+
+
+            const formData = new FormData(form);
+
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+
+                if (!response.ok) {
+                    throw new Error('Upload failed. Please try again.');
+                }
+
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+
+                downloadLink.href = url;
+                loading.classList.add('hidden');
+                download.classList.remove('hidden');
+            } catch (err) {
+                loading.classList.add('hidden');
+                errorDiv.textContent = err.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
