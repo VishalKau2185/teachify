@@ -12,22 +12,37 @@
             <p class="mt-2 text-gray-600">Upload your slides and get a narrated video!</p>
         </div>
 
-
         <form id="upload-form" class="bg-white p-8 rounded-2xl shadow-md space-y-6" enctype="multipart/form-data">
             <div>
-                <label class="block text-gray-700 font-medium mb-2" for="file">Upload PDF or PowerPoint</label>
+                <label class="block text-gray-700 font-medium mb-2" for="file">Upload PDF</label>
                 <input type="file" name="file" id="file" accept=".pdf" required
                     class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
+            <div>
+                <label class="block text-gray-700 font-medium mb-2" for="voice_id">Select Voice</label>
+                <select name="voice_id" id="voice_id"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+                    <option value="21m00Tcm4TlvDq8ikWAM" selected>Rachel</option>
+                    <option value="mkZwO4JCm0yEo6WmjZjA">Rob</option>
+                    <option value="qTYTve5yPlN0yHKVuCYy">Aaron</option>
+                    <option value="kdmDKE6EkgrWrrykO9Qt">Alexandra</option>
+                </select>
+
+                <div class="flex flex-col space-y-2 mt-2">
+                    <button type="button" onclick="playSample('rachel')" class="text-blue-600 hover:underline text-left">▶️ Rachel Sample</button>
+                    <button type="button" onclick="playSample('rob')" class="text-blue-600 hover:underline text-left">▶️ Rob Sample</button>
+                    <button type="button" onclick="playSample('aaron')" class="text-blue-600 hover:underline text-left">▶️ Aaron Sample</button>
+                    <button type="button" onclick="playSample('alexandra')" class="text-blue-600 hover:underline text-left">▶️ Alexandra Sample</button>
+                </div>
+            </div>
 
             <div>
                 <label class="block text-gray-700 font-medium mb-2" for="custom_prompt">Optional Prompt</label>
                 <input type="text" name="custom_prompt" id="custom_prompt" maxlength="100"
-                    placeholder="e.g., Explain it more casually."
+                    placeholder="e.g., Explain casually."
                     class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-
 
             <button type="submit"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
@@ -35,16 +50,14 @@
             </button>
         </form>
 
-
         <div id="loading" class="hidden flex flex-col items-center mt-6">
             <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                 <path class="opacity-75" fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
             </svg>
-            <p class="text-gray-600 text-center">Processing your slides... <br><span class="text-sm">Longer slideshows may take a while (~20 seconds per slide). Please be patient!</span></p>
+            <p class="text-gray-600 text-center">Processing your slides... <br><span class="text-sm">(~20 seconds per slide)</span></p>
         </div>
-
 
         <div id="download" class="hidden flex flex-col items-center mt-6">
             <a id="download-link" href="#" download
@@ -53,10 +66,8 @@
             </a>
         </div>
 
-
         <div id="error" class="hidden mt-4 text-red-500 text-center font-semibold"></div>
     </div>
-
 
     <script>
         const form = document.getElementById('upload-form');
@@ -65,16 +76,13 @@
         const downloadLink = document.getElementById('download-link');
         const errorDiv = document.getElementById('error');
 
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             loading.classList.remove('hidden');
             errorDiv.classList.add('hidden');
             download.classList.add('hidden');
 
-
             const formData = new FormData(form);
-
 
             try {
                 const response = await fetch('/upload', {
@@ -82,15 +90,12 @@
                     body: formData
                 });
 
-
                 if (!response.ok) {
                     throw new Error('Upload failed. Please try again.');
                 }
 
-
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
-
 
                 downloadLink.href = url;
                 loading.classList.add('hidden');
@@ -101,9 +106,28 @@
                 errorDiv.classList.remove('hidden');
             }
         });
+
+        let currentAudio = null;
+
+        function playSample(voice) {
+            const samples = {
+                rachel: '/static/samples/rachel_sample.mp3',
+                rob: '/static/samples/rob_sample.mp3',
+                aaron: '/static/samples/aaron_sample.mp3',
+                alexandra: '/static/samples/alexandra_sample.mp3'
+            };
+
+
+            const url = samples[voice];
+            if (url) {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = new Audio(url);
+                currentAudio.play().catch(err => console.error('Autoplay error:', err));
+            }
+        }
     </script>
 </body>
 </html>
-
-
-

@@ -2,5 +2,5 @@ services:
   - type: web
     name: teachify
     env: python
-    buildCommand: "apt-get update && apt-get install -y tesseract-ocr ffmpeg && pip install -r requirements.txt"
+    buildCommand: "pip install -r requirements.txt"
     startCommand: "python3 api/index.py"
