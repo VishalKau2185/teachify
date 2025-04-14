@@ -35,7 +35,7 @@ client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
 easyocr_reader = easyocr.Reader(['en'], gpu=False)
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # ========== SEMAPHORE ==========
